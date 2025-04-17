@@ -20,6 +20,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/apex/log"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -50,7 +52,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	rootCmd.PersistentFlags().CountP(VERBOSE, VERBOSE_SHORT, "repeat for more verbose printouts")
-	rootCmd.PersistentFlags().StringP(CONFIG_FILE, CONFIG_FILE_SHORT, "config file (default is $HOME/.tldrpki)")
+	rootCmd.PersistentFlags().StringP(CONFIG_FILE, CONFIG_FILE_SHORT, "", "config file (default is $HOME/.tldrpki)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -65,7 +67,7 @@ func init() {
 func initConfig() {
 	if viper.GetString(CONFIG_FILE) != "" {
 		// Use config file from the flag.
-		viper.SetConfigFile(viper.getString(CONFIG_FILE))
+		viper.SetConfigFile(viper.GetString(CONFIG_FILE))
 	} else {
 		// Find home directory.
 		home, err := os.UserHomeDir()

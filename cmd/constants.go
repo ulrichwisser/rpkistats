@@ -40,6 +40,13 @@ const DOMAIN_SHORT = "d"
 const DOMAIN_FILE string = "domainlist"
 const DOMAIN_FILE_SHORT string = "f"
 
+const ROUTINATOR string = "routinator"
+const ROUTINATOR_SHORT = "r"
+
+const RESOLVER string = "resolver"
+const RESOLVER_SHORT string = "s"
+
+const TIMEOUT = 3
 
 func init() {
 

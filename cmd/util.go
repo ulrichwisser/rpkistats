@@ -14,10 +14,24 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
-package main
+package cmd
 
-import "github.com/ulrichwisser/rpkistats/cmd"
+import (
 
-func main() {
-	cmd.Execute()
+)
+
+
+func unique(strlist []string) (resultlist []string) {
+	resultlist = make([]string, 0)
+	strmap := make(map[string]bool, 0)
+
+	for _,s := range strlist {
+		strmap[s] = true
+	}
+
+	for s := range strmap {
+		resultlist = append(resultlist, s)
+	}
+
+	return
 }
