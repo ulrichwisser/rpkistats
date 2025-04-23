@@ -66,6 +66,7 @@ func init() {
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	if viper.GetString(CONFIG_FILE) != "" {
+		fmt.Printf("config file given: %s\n", viper.GetString(CONFIG_FILE))
 		// Use config file from the flag.
 		viper.SetConfigFile(viper.GetString(CONFIG_FILE))
 	} else {
@@ -73,10 +74,10 @@ func initConfig() {
 		home, err := os.UserHomeDir()
 		cobra.CheckErr(err)
 
-		// Search config in home directory with name ".tldrpki" (without extension).
+		// Search config in home directory with name ".rpkistats" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigType("yaml")
-		viper.SetConfigName(".tldrpki")
+		viper.SetConfigName(".rpkistats")
 	}
 
 	// read in environment variables that match
@@ -86,6 +87,8 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+	} else {
+		fmt.Fprintf(os.Stderr, "Error reading config file: %s\n", err)
 	}
 
 	// init log level

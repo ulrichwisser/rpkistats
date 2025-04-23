@@ -1,0 +1,5 @@
+dbcredentials: "root:YourMySqlDatabasePassword@tcp(127.0.0.1:3306)/test"
+resolver: 127.0.0.1
+routinator: "http://localhost:8323/json?select-prefix="
+
+

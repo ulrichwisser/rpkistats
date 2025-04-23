@@ -72,39 +72,71 @@ func init() {
 }
 
 func execRun(cmd *cobra.Command, args []string) {
-	fmt.Println("run called")
 
 	if viper.GetString(ROUTINATOR) == "" {
 		cmd.Help();
 		log.Fatal("Routinator must be given.")
+	} else {
+		log.Debugf("Routinator: %s", viper.GetString(ROUTINATOR))
 	}
 
 	if viper.GetString(RESOLVER) == "" {
 		cmd.Help();
 		log.Fatal("Resolver must be given.")
+	} else {
+		log.Debugf("Resolver: %s", viper.GetString(RESOLVER))
 	}
 
 	if viper.GetString(DOMAIN) == "" && viper.GetString(DOMAIN_FILE) == "" {
 		cmd.Help();
 		log.Fatal("Domain or domain list must be given.")
+	} else {
+		if viper.GetString(DOMAIN) != "" {
+			log.Debugf("Domain: %s", viper.GetString(DOMAIN))
+		}
+		if viper.GetString(DOMAIN_FILE) != "" {
+			log.Debugf("Domain file: %s", viper.GetString(DOMAIN_FILE))
+		} 
 	}
 
+	if viper.GetString(DBCREDENTIALS) == "" {
+		log.Debugf("DBCredentials not given.")
+	} else {
+		log.Debugf("DBCredentials: %s", viper.GetString(DBCREDENTIALS))
+	}
+	
 	// single domain gets only printed on command line, not saved to database
 	if viper.GetString(DOMAIN) != "" {
-		viper.Set(VERBOSE, VERBOSE_INFO)
 		domain := viper.GetString(DOMAIN)
 		log.Debugf("Single domain statistics (no db): %s", domain)
-		domainStat(domain)
+		rpkistat := domainStat(domain)
+		fmt.Printf("Domain    %-15s\n", rpkistat.Domain)
+		fmt.Printf("Names     %2d\n",   rpkistat.Names)
+		fmt.Printf("  Full    %2d\n",   rpkistat.NamesFull)
+		fmt.Printf("  Partial %2d\n",   rpkistat.NamesPartial)
+		fmt.Printf("IPv4      %2d\n",   rpkistat.IPv4)
+		fmt.Printf("  ROAs    %2d\n",   rpkistat.IPv4roas)
+		fmt.Printf("  TA      %2d\n",   rpkistat.TAs4)
+		fmt.Printf("  AS ROAs %2d\n",   rpkistat.AS4)
+		fmt.Printf("IPv6      %2d\n",   rpkistat.IPv6)
+		fmt.Printf("  ROAs    %2d\n",   rpkistat.IPv6roas)
+		fmt.Printf("  TA      %2d\n",   rpkistat.TAs6)
+		fmt.Printf("  AS ROAs %2d\n",   rpkistat.AS6)
 		return
 	}
 
-	// open database
-	//db := openDB()
-
-	
 	domainfile := viper.GetString(DOMAIN_FILE)
 	log.Debugf("Using domain file: %s", domainfile)
-	handleDomainList(domainfile)
+	rpkistats := handleDomainList(domainfile)
+
+	if viper.GetString(DBCREDENTIALS) == "" {
+		// do not save to database
+		return
+	}
+
+	// save results to database
+	db := openDB()
+	rpki2db(db, rpkistats)
 }
 
 func handleDomainList(filename string) (stats []*RPKIstat) {
